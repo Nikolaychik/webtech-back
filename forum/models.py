@@ -10,10 +10,12 @@ class Faculty(models.Model):
 class User(AbstractUser):
     username = models.CharField(max_length=120, unique=True)
     password = models.CharField(max_length=250)
-    first_name = models.CharField(max_length=120, null=True)
-    last_name = models.CharField(max_length=120, null=True)
+    USERNAME_FIELD = 'username'
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar_url = models.ImageField(null=True)
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
-    USERNAME_FIELD = 'username'
 
 
