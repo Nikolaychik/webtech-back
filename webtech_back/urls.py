@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
 
+from django.conf.urls.static import static
 from forum.views import UserCreateView, UserDetailView, PostListCreateView, PostDetailsView
 
 urlpatterns = [
@@ -24,4 +26,4 @@ urlpatterns = [
     path('api/user/<user_id>', UserDetailView.as_view()),
     path('api/post', PostListCreateView.as_view()),
     path('api/post/<post_id>', PostDetailsView.as_view()),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

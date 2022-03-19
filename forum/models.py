@@ -34,7 +34,7 @@ class Post(models.Model):
     owner_id = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    cover_url = models.ImageField(null=True)
+    cover_url = models.ImageField(null=True, upload_to='posts')
 
 
 class PostReaction(models.Model):
