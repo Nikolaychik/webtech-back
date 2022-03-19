@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from forum.models import User
+from forum.models import User, Post
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,3 +12,9 @@ class UserSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         attrs['user_id'] = user.id
         return attrs
+
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
