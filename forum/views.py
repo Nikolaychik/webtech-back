@@ -1,9 +1,11 @@
 from rest_framework import generics
+from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
-from forum.models import Post, PostComment
-from forum.serializers import UserSerializer, PostSerializer, PostCommentSerializer
+from forum.models import Post, PostReaction, Reactions, PostComment
+from forum.serializers import UserSerializer, PostSerializer, \
+    PostReactionSerializer, PostCommentSerializer
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -30,7 +32,33 @@ class PostDetailsView(generics.RetrieveUpdateDestroyAPIView):
         return get_object_or_404(Post, id=self.kwargs["post_id"])
 
 
-class PostCommentsView(generics.ListCreateAPIView):
+class PostReactionsListCreateView(generics.ListCreateAPIView):
+    serializer_class = PostReactionSerializer
+    queryset = PostReaction.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        post_id = int(self.kwargs["post_id"])
+
+        post_reactions = {r for r in self.get_queryset() if r.post_id.id == post_id}
+        likes = {r for r in post_reactions if r.type == Reactions.LIKE_SHORT.value}
+        dislikes = post_reactions - likes
+
+        if user in [r.user_id for r in likes]:
+            user_reaction = Reactions.LIKE.value
+        elif user in [r.user_id for r in dislikes]:
+            user_reaction = Reactions.DISLIKE.value
+        else:
+            user_reaction = None
+
+        return Response({
+            "likes": len(likes),
+            "dislikes": len(dislikes),
+            "user_reaction": user_reaction
+        })
+
+
+class PostCommentsListCreateView(generics.ListCreateAPIView):
     serializer_class = PostCommentSerializer
     queryset = PostComment.objects.all()
 
