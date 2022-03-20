@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from forum.models import User, Post
+from forum.models import User, Post, PostComment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,4 +17,10 @@ class UserSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
+        fields = '__all__'
+
+
+class PostCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostComment
         fields = '__all__'

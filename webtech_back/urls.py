@@ -18,7 +18,8 @@ from django.urls import path
 from django.conf import settings
 
 from django.conf.urls.static import static
-from forum.views import UserCreateView, UserDetailView, PostListCreateView, PostDetailsView
+from forum.views import UserCreateView, UserDetailView, PostListCreateView, PostDetailsView, \
+    PostCommentsView, PostCommentDetailsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +27,6 @@ urlpatterns = [
     path('api/user/<user_id>', UserDetailView.as_view()),
     path('api/post', PostListCreateView.as_view()),
     path('api/post/<post_id>', PostDetailsView.as_view()),
+    path('api/post/<post_id>/comments', PostCommentsView.as_view()),
+    path('api/post/<post_id>/comments/<comment_id>', PostCommentDetailsView.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
