@@ -1,8 +1,17 @@
+from enum import Enum
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-REACTION_CHOICES = (('l', 'Like'), ('d', 'Dislike'))
+class Reactions(Enum):
+    LIKE = 'Like'
+    LIKE_SHORT = 'l'
+    DISLIKE = 'Dislike'
+    DISLIKE_SHORT = 'd'
+
+
+REACTION_CHOICES = ((Reactions.LIKE_SHORT.value, Reactions.LIKE.value),
+                    (Reactions.DISLIKE_SHORT.value, Reactions.DISLIKE.value))
 
 
 class Faculty(models.Model):
