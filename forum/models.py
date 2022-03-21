@@ -51,6 +51,9 @@ class PostReaction(models.Model):
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
     type = models.CharField(choices=REACTION_CHOICES, max_length=20)
 
+    class Meta:
+        unique_together = (("user_id", "post_id"),)
+
 
 class PostComment(models.Model):
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -64,3 +67,6 @@ class PostCommentReaction(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     comment_id = models.ForeignKey(PostComment, on_delete=models.CASCADE)
     type = models.CharField(choices=REACTION_CHOICES, max_length=20)
+
+    class Meta:
+        unique_together = (("user_id", "comment_id"),)
