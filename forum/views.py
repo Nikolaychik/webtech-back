@@ -30,7 +30,6 @@ class PostDetailsView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
 
     def get_object(self):
-        from ipdb import set_trace; set_trace()
         return get_object_or_404(Post, id=self.kwargs["post_id"])
 
 
