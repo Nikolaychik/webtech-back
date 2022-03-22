@@ -54,6 +54,7 @@ class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
         reaction_type = request.data['type']
         if not isinstance(user, AnonymousUser):
             user_reaction = self.get_object()
+            # TODO: If user_reaction is None - create new reaction
             if user_reaction.type == reaction_type:
                 user_reaction.delete()
             else:
