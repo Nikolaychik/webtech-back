@@ -1,0 +1,19 @@
+POST REACTIONS
+/api/post/<post_id>/reactions
+
+# GET
+- Arguments:
+    post_id <int>
+- Response:
+    likes <int>
+    dislikes <int>
+    type OneOf('l', 'd', None) <str> | None
+
+# PUT
+- Arguments:
+    post_id <int>
+    type OneOf('l', 'd', None) <str> | None
+- Response:
+    likes <int>
+    dislikes <int>
+    type OneOf('l', 'd', None) <str> | None

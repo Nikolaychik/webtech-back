@@ -1,11 +1,12 @@
+from django.contrib.auth.models import AnonymousUser
 from rest_framework import generics
-from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
-from forum.models import Post, PostReaction, Reactions, PostComment
+from forum.models import Post, PostReaction, PostComment
 from forum.serializers import UserSerializer, PostSerializer, \
     PostReactionSerializer, PostCommentSerializer
+from forum.tools import PostReactionsTool
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -29,33 +30,37 @@ class PostDetailsView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
 
     def get_object(self):
+        from ipdb import set_trace; set_trace()
         return get_object_or_404(Post, id=self.kwargs["post_id"])
 
 
 class PostReactionsListCreateView(generics.ListCreateAPIView):
     serializer_class = PostReactionSerializer
-    queryset = PostReaction.objects.all()
 
     def get(self, request, *args, **kwargs):
+        return PostReactionsTool.get_post_reactions(self.request.user, self.kwargs["post_id"])
+
+
+class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PostReactionSerializer
+
+    def get_object(self):
+        return PostReaction.objects.filter(
+            post_id=self.kwargs["post_id"],
+            user_id=self.request.user).first()
+
+    def put(self, request, *args, **kwargs):
         user = self.request.user
-        post_id = int(self.kwargs["post_id"])
+        reaction_type = request.data['type']
+        if not isinstance(user, AnonymousUser):
+            user_reaction = self.get_object()
+            if user_reaction.type == reaction_type:
+                user_reaction.delete()
+            else:
+                setattr(user_reaction, 'type', reaction_type)
+                user_reaction.save()
 
-        post_reactions = {r for r in self.get_queryset() if r.post_id.id == post_id}
-        likes = {r for r in post_reactions if r.type == Reactions.LIKE_SHORT.value}
-        dislikes = post_reactions - likes
-
-        if user in [r.user_id for r in likes]:
-            user_reaction = Reactions.LIKE.value
-        elif user in [r.user_id for r in dislikes]:
-            user_reaction = Reactions.DISLIKE.value
-        else:
-            user_reaction = None
-
-        return Response({
-            "likes": len(likes),
-            "dislikes": len(dislikes),
-            "user_reaction": user_reaction
-        })
+        return PostReactionsTool.get_post_reactions(self.request.user, self.kwargs["post_id"])
 
 
 class PostCommentsListCreateView(generics.ListCreateAPIView):
