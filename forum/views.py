@@ -50,7 +50,7 @@ class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
 
     def put(self, request, *args, **kwargs):
         user = self.request.user
-        reaction_type = request.data['type']
+        reaction_type = kwargs['reaction_type']
         if not isinstance(user, AnonymousUser):
             user_reaction = self.get_object()
             # TODO: If user_reaction is None - create new reaction

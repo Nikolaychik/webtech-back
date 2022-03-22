@@ -29,7 +29,8 @@ urlpatterns = [
     path('api/post', PostListCreateView.as_view()),
     path('api/post/<post_id>', PostDetailsView.as_view()),
     path('api/post/<post_id>/reactions', PostReactionsListCreateView.as_view()),
-    path('api/post/<post_id>/react', PostReactionsRetrieveUpdateDestroyView.as_view()),
+    path('api/post/<post_id>/reactions/<reaction_type>',
+         PostReactionsRetrieveUpdateDestroyView.as_view()),
     path('api/post/<post_id>/comments', PostCommentsListCreateView.as_view()),
     path('api/post/<post_id>/comments/<comment_id>', PostCommentDetailsView.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
