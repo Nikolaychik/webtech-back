@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
-from forum.models import Post, PostReaction, PostComment
+from forum.models import Post, PostReaction, PostComment, User
 from forum.serializers import UserSerializer, PostSerializer, \
     PostReactionSerializer, PostCommentSerializer
 from forum.tools import PostReactionsTool
@@ -44,26 +44,28 @@ class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
     serializer_class = PostReactionSerializer
 
     def get_object(self):
+        """ rtype: PostReaction | None """
         return PostReaction.objects.filter(
             post_id=self.kwargs["post_id"],
             user_id=self.request.user).first()
 
     def put(self, request, *args, **kwargs):
-        user = self.request.user
-        reaction_type = kwargs['reaction_type']
-        if not isinstance(user, AnonymousUser):
-            user_reaction = self.get_object()
-            if not user_reaction:
-                serializer = self.get_serializer({"user_id": user, "type": reaction_type})
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-            elif user_reaction.type == reaction_type:
-                user_reaction.delete()
-            else:
-                setattr(user_reaction, 'type', reaction_type)
-                user_reaction.save()
+        post_id, reaction_type = kwargs["post_id"], kwargs['reaction_type']
+        user_reaction = self.get_object()
+        if not user_reaction:
+            serializer = self.get_serializer(
+                data={"user_id": request.user.id,
+                      "post_id": post_id,
+                      "type": reaction_type})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        elif user_reaction.type == reaction_type:
+            user_reaction.delete()
+        else:
+            setattr(user_reaction, 'type', reaction_type)
+            user_reaction.save()
 
-        return PostReactionsTool.get_post_reactions(self.request.user, self.kwargs["post_id"])
+        return PostReactionsTool.get_post_reactions(request.user, post_id)
 
 
 class PostCommentsListCreateView(generics.ListCreateAPIView):
