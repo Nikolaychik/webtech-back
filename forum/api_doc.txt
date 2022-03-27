@@ -7,14 +7,14 @@ POST REACTIONS
 - Response:
     likes <int>
     dislikes <int>
-    type OneOf('l', 'd', None) <str> | None
+    user_reaction OneOf('l', 'd', None) <str> | None
 
 # PUT
 - URL: /api/post/<post_id>/reactions/<reaction_type>
 - Arguments:
     post_id <int>
-    type OneOf('l', 'd', None) <str> | None
+    reaction_type OneOf('l', 'd') <str>
 - Response:
     likes <int>
     dislikes <int>
-    type OneOf('l', 'd', None) <str> | None
+    user_reaction OneOf('l', 'd', None) <str> | None
