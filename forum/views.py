@@ -1,11 +1,12 @@
+from django.contrib.auth.models import AnonymousUser
 from rest_framework import generics
-from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
-from forum.models import Post, PostReaction, Reactions, PostComment
+from forum.models import Post, PostReaction, PostComment, User
 from forum.serializers import UserSerializer, PostSerializer, \
     PostReactionSerializer, PostCommentSerializer
+from forum.tools import PostReactionsTool
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -34,28 +35,37 @@ class PostDetailsView(generics.RetrieveUpdateDestroyAPIView):
 
 class PostReactionsListCreateView(generics.ListCreateAPIView):
     serializer_class = PostReactionSerializer
-    queryset = PostReaction.objects.all()
 
     def get(self, request, *args, **kwargs):
-        user = self.request.user
-        post_id = int(self.kwargs["post_id"])
+        return PostReactionsTool.get_post_reactions(self.request.user, self.kwargs["post_id"])
 
-        post_reactions = {r for r in self.get_queryset() if r.post_id.id == post_id}
-        likes = {r for r in post_reactions if r.type == Reactions.LIKE_SHORT.value}
-        dislikes = post_reactions - likes
 
-        if user in [r.user_id for r in likes]:
-            user_reaction = Reactions.LIKE.value
-        elif user in [r.user_id for r in dislikes]:
-            user_reaction = Reactions.DISLIKE.value
+class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PostReactionSerializer
+
+    def get_object(self):
+        """ rtype: PostReaction | None """
+        return PostReaction.objects.filter(
+            post_id=self.kwargs["post_id"],
+            user_id=self.request.user).first()
+
+    def put(self, request, *args, **kwargs):
+        post_id, reaction_type = kwargs["post_id"], kwargs['reaction_type']
+        user_reaction = self.get_object()
+        if not user_reaction:
+            serializer = self.get_serializer(
+                data={"user_id": request.user.id,
+                      "post_id": post_id,
+                      "type": reaction_type})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        elif user_reaction.type == reaction_type:
+            user_reaction.delete()
         else:
-            user_reaction = None
+            setattr(user_reaction, 'type', reaction_type)
+            user_reaction.save()
 
-        return Response({
-            "likes": len(likes),
-            "dislikes": len(dislikes),
-            "user_reaction": user_reaction
-        })
+        return PostReactionsTool.get_post_reactions(request.user, post_id)
 
 
 class PostCommentsListCreateView(generics.ListCreateAPIView):
