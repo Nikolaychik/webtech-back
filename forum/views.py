@@ -53,8 +53,11 @@ class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
         reaction_type = kwargs['reaction_type']
         if not isinstance(user, AnonymousUser):
             user_reaction = self.get_object()
-            # TODO: If user_reaction is None - create new reaction
-            if user_reaction.type == reaction_type:
+            if not user_reaction:
+                serializer = self.get_serializer({"user_id": user, "type": reaction_type})
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+            elif user_reaction.type == reaction_type:
                 user_reaction.delete()
             else:
                 setattr(user_reaction, 'type', reaction_type)
