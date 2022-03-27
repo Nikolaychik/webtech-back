@@ -1,7 +1,7 @@
 POST REACTIONS
-/api/post/<post_id>/reactions
 
 # GET
+- URL: /api/post/<post_id>/reactions
 - Arguments:
     post_id <int>
 - Response:
@@ -10,6 +10,7 @@ POST REACTIONS
     type OneOf('l', 'd', None) <str> | None
 
 # PUT
+- URL: /api/post/<post_id>/reactions/<reaction_type>
 - Arguments:
     post_id <int>
     type OneOf('l', 'd', None) <str> | None
