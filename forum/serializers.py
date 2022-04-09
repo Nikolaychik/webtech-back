@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from forum.tools import PostReactionsTool
-from forum.models import User, Post, PostComment, PostReaction, PostCategory
+from forum.models import User, Post, PostComment, PostReaction, Reactions
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -16,63 +15,54 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PostListSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    category_id = serializers.IntegerField()
+    category_name = serializers.CharField(source='category.name')
+    title = serializers.CharField()
+    created_at = serializers.DateTimeField()
+    updated_at = serializers.DateTimeField()
+    cover_picture = serializers.ImageField(use_url=False)
+    owner_id = serializers.IntegerField()
+    owner_username = serializers.CharField(source='owner.username')
+    owner_avatar_picture = serializers.ImageField(source='owner.avatar_picture', use_url=False)
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+    user_reaction_type = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
+
+    def get_comments_count(self, post):
+        return post.comments.all().count()
+
+    def get_likes_count(self, post):
+        return post.reactions.filter(type=Reactions.LIKE_SHORT.value).count()
+
+    def get_dislikes_count(self, post):
+        return post.reactions.filter(type=Reactions.DISLIKE_SHORT.value).count()
+
+    def get_user_reaction_type(self, post):
+        # TODO: change to request user
+        user = User.objects.first()
+        user_reaction = post.reactions.filter(user=user).first()
+        return user_reaction and user_reaction.type
+
     class Meta:
         model = Post
-        fields = '__all__'
-
-    def to_representation(self, instance):
-        """
-        :type instance: forum.models.Post
-        :rtype: dict
-        """
-        post = instance
-        reactions = PostReactionsTool.get_post_reactions(post.owner_id, post.id)
-        comments = PostComment.objects.filter(post_id=post.id)
-
-        return {
-            "id": post.id,
-            "category": post.category_id.name,
-            "title": post.title,
-            "created_at": post. created_at,
-            "updated_at": post.updated_at,
-            "cover_url": post.cover_url.path,
-            "owner": post.owner_id.username,
-            "reactions": reactions,
-            "comments": len(comments)
-        }
-
-
-class PostSerializer(serializers.ModelSerializer):
-    title = serializers.StringRelatedField(required=False)
-    body = serializers.StringRelatedField(required=False)
-    owner_id = serializers.RelatedField(read_only=True)
-
-    class Meta:
-        model = Post
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        """
-        :type instance: forum.models.Post
-        :rtype: dict
-        """
-        post = instance
-        reactions = PostReactionsTool.get_post_reactions(post.owner_id, post.id)
-        comments = PostComment.objects.filter(post_id=post.id)
-
-        return {
-            "id": post.id,
-            "category_id": post.category_id.id,
-            "category": post.category_id.name,
-            "title": post.title,
-            "body": post.body,
-            "created_at": post. created_at,
-            "updated_at": post.updated_at,
-            "cover_url": post.cover_url.path,
-            "owner": post.owner_id.username,
-            "reactions": reactions,
-            "comments": [PostCommentSerializer().to_representation(c) for c in comments]
-        }
+        fields = [
+            'id',
+            'category_id',
+            'category_name',
+            'title',
+            'created_at',
+            'updated_at',
+            'cover_picture',
+            'owner_id',
+            'owner_username',
+            'owner_avatar_picture',
+            'likes_count',
+            'dislikes_count',
+            'user_reaction_type',
+            'comments_count',
+        ]
 
 
 class PostReactionSerializer(serializers.ModelSerializer):
@@ -86,6 +76,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
         model = PostComment
         fields = '__all__'
 
+    # todo: refactor without to_representation
     def to_representation(self, instance):
         """
         :type instance: PostComment
@@ -95,7 +86,17 @@ class PostCommentSerializer(serializers.ModelSerializer):
         return {
             "id": comment.id,
             "body": comment.body,
-            "owner": comment.owner_id.username,
+            "owner": comment.owner.username,
             "updated_at": comment.updated_at,
             "created_at": comment.created_at
         }
+
+
+class PostDetailSerializer(PostListSerializer):
+    comments = PostCommentSerializer(many=True)
+
+    class Meta:
+        model = Post
+        fields = PostListSerializer.Meta.fields + [
+            'comments',
+        ]

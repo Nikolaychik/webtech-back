@@ -1,9 +1,8 @@
 from django.contrib import admin
 
-from forum.models import User, UserProfile, Faculty, Post, PostCategory, PostReaction, PostComment, PostCommentReaction
+from forum.models import User, Faculty, Post, PostCategory, PostReaction, PostComment, PostCommentReaction
 
 admin.site.register(User)
-admin.site.register(UserProfile)
 admin.site.register(Faculty)
 admin.site.register(Post)
 admin.site.register(PostCategory)

@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count
 from rest_framework.response import Response
 from forum.models import Post, PostReaction, PostComment, User
-from forum.serializers import UserSerializer, PostSerializer, PostListSerializer, \
+from forum.serializers import UserSerializer, PostDetailSerializer, PostListSerializer, \
     PostReactionSerializer, PostCommentSerializer
 from forum.tools import PostReactionsTool
 
@@ -32,12 +32,12 @@ class PostListCreateView(generics.ListCreateAPIView):
         if order == 'new':
             qs = qs.order_by("-created_at")
         elif order == 'popular':
-            qs = qs.annotate(likes=Count('reactions'))
+            qs = qs.order_by('-reactions')
         return qs
 
 
 class PostDetailsView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = PostSerializer
+    serializer_class = PostDetailSerializer
 
     def get_object(self):
         return get_object_or_404(Post, id=self.kwargs["post_id"])
@@ -49,8 +49,8 @@ class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
     def get_the_object(self, user):
         """ rtype: PostReaction | None """
         return PostReaction.objects.filter(
-            post_id=self.kwargs["post_id"],
-            user_id=user).first()
+            post=self.kwargs["post_id"],
+            user=user).first()
 
     def put(self, request, *args, **kwargs):
         # TODO: change to request user
@@ -59,8 +59,8 @@ class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
         user_reaction = self.get_the_object(user)
         if not user_reaction:
             serializer = self.get_serializer(
-                data={"user_id": user.id,
-                      "post_id": post_id,
+                data={"user": user.id,
+                      "post": post_id,
                       "type": reaction_type})
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -79,6 +79,10 @@ class PostCommentsListCreateView(generics.ListCreateAPIView):
 
     def get(self, request, *args, **kwargs):
         return self.list(request, post_id=self.kwargs["post_id"])
+
+    def create(self, request, *args, **kwargs):
+        request.data['post'] = self.kwargs["post_id"]
+        return super().create(request, *args, **kwargs)
 
 
 class PostCommentDetailsView(generics.RetrieveUpdateDestroyAPIView):

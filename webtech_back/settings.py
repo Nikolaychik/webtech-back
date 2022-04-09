@@ -25,9 +25,6 @@ SECRET_KEY = 'django-insecure-(zd_b40dtq9)z%fmx0p&3(t2ni#sy%icp(mn0smr4$vpr@-^(%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
-
 # Application definition
 AUTH_USER_MODEL = 'forum.User'
 
@@ -38,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'forum',
 ]
 
@@ -128,3 +126,4 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
