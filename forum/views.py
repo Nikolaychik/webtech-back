@@ -2,10 +2,10 @@ from rest_framework import generics, permissions
 from rest_framework.generics import get_object_or_404
 
 from rest_framework.response import Response
-from forum.models import Post, PostReaction, PostComment, User
+from forum.models import Post, PostReaction, PostComment, User, PostCategory, PostCommentReaction
 from forum.serializers import UserSerializer, PostDetailSerializer, PostListSerializer, \
-    PostReactionSerializer, PostCommentSerializer
-from forum.tools import PostReactionsTool
+    PostReactionSerializer, PostCommentSerializer, PostCategorySerializer, PostCommentReactionSerializer
+from forum.tools import ReactionsTool
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -18,6 +18,11 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
     def get_queryset(self):
         return self.request.user
+
+
+class ListCategoriesView(generics.ListAPIView):
+    serializer_class = PostCategorySerializer
+    queryset = PostCategory.objects.all()
 
 
 class PostListCreateView(generics.ListCreateAPIView):
@@ -48,17 +53,16 @@ class PostDetailsView(generics.RetrieveUpdateDestroyAPIView):
 class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostReactionSerializer
 
-    def get_the_object(self, user):
+    def get_object(self):
         """ rtype: PostReaction | None """
         return PostReaction.objects.filter(
             post=self.kwargs["post_id"],
-            user=user).first()
+            user=self.request.user).first()
 
     def put(self, request, *args, **kwargs):
-        # TODO: change to request user
-        user = request.user.id
+        user = request.user
         post_id, reaction_type = kwargs["post_id"], kwargs['reaction_type']
-        user_reaction = self.get_the_object(user)
+        user_reaction = self.get_object()
         if not user_reaction:
             serializer = self.get_serializer(
                 data={"user": user.id,
@@ -72,7 +76,36 @@ class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
             setattr(user_reaction, 'type', reaction_type)
             user_reaction.save()
 
-        return Response(PostReactionsTool.get_post_reactions(user, post_id))
+        return Response(ReactionsTool.get_post_reactions(user, post_id))
+
+
+class PostCommentReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PostCommentReactionSerializer
+
+    def get_object(self):
+        """ rtype: PostCommentReaction | None """
+        return PostCommentReaction.objects.filter(
+            comment=self.kwargs["comment_id"],
+            user=self.request.user).first()
+
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        comment_id, reaction_type = kwargs["comment_id"], kwargs['reaction_type']
+        user_reaction = self.get_object()
+        if not user_reaction:
+            serializer = self.get_serializer(
+                data={"user": user.id,
+                      "comment": comment_id,
+                      "type": reaction_type})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        elif user_reaction.type == reaction_type:
+            user_reaction.delete()
+        else:
+            setattr(user_reaction, 'type', reaction_type)
+            user_reaction.save()
+
+        return Response(ReactionsTool.get_post_comment_reactions(user, comment_id))
 
 
 class PostCommentsListCreateView(generics.ListCreateAPIView):
