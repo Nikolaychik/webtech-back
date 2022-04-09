@@ -83,7 +83,6 @@ class PostCommentsListCreateView(generics.ListCreateAPIView):
         return self.list(request, post_id=self.kwargs["post_id"])
 
     def create(self, request, *args, **kwargs):
-        from ipdb import set_trace; set_trace()
         request.data['post_id'] = int(self.kwargs["post_id"])
         # TODO: change to request.user
         request.data['owner_id'] = User.objects.first().id
