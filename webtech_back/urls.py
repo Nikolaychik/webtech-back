@@ -22,7 +22,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from forum.views import UserCreateView, UserDetailView, PostListCreateView, PostDetailsView, \
     PostReactionsRetrieveUpdateDestroyView, PostCommentsListCreateView, \
-    PostCommentDetailsView
+    PostCommentDetailsView, ListCategoriesView, PostCommentReactionsRetrieveUpdateDestroyView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,9 +30,12 @@ urlpatterns = [
     path('api/register', UserCreateView.as_view()),
     path('api/user/<user_id>', UserDetailView.as_view()),
     path('api/post', PostListCreateView.as_view()),
+    path('api/post/categories', ListCategoriesView.as_view()),
     path('api/post/<post_id>', PostDetailsView.as_view()),
     path('api/post/<post_id>/reactions/<reaction_type>',
          PostReactionsRetrieveUpdateDestroyView.as_view()),
     path('api/post/<post_id>/comments', PostCommentsListCreateView.as_view()),
     path('api/post/<post_id>/comments/<comment_id>', PostCommentDetailsView.as_view()),
+    path('api/post/<post_id>/comments/<comment_id>/reactions/<reaction_type>',
+         PostCommentReactionsRetrieveUpdateDestroyView.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

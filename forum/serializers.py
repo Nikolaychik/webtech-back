@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from forum.models import User, Post, PostComment, PostReaction, Reactions, Faculty
+from forum.models import User, Post, PostComment, PostReaction, Reactions, Faculty, PostCategory, PostCommentReaction
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,6 +34,12 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class PostCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostCategory
+        fields = '__all__'
 
 
 class PostListSerializer(serializers.ModelSerializer):
@@ -103,10 +109,20 @@ class PostCommentSerializer(serializers.ModelSerializer):
     owner_username = serializers.CharField(source='owner.username', required=False)
     owner_avatar_picture = serializers.ImageField(source='owner.avatar_picture',
                                                   use_url=False, required=False)
-    # TODO:
-    # likes_count = serializers.SerializerMethodField()
-    # dislikes_count = serializers.SerializerMethodField()
-    # user_reaction_type = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+    user_reaction_type = serializers.SerializerMethodField()
+
+    def get_likes_count(self, comment):
+        return comment.comment_reactions.filter(type=Reactions.LIKE_SHORT.value).count()
+
+    def get_dislikes_count(self, comment):
+        return comment.comment_reactions.filter(type=Reactions.DISLIKE_SHORT.value).count()
+
+    def get_user_reaction_type(self, comment):
+        user_reaction = comment.comment_reactions.filter(user=self.context['request'].user).first()
+        return user_reaction and user_reaction.type
+
     class Meta:
         model = PostComment
         fields = [
@@ -118,6 +134,9 @@ class PostCommentSerializer(serializers.ModelSerializer):
             'owner_id',
             'owner_username',
             'owner_avatar_picture',
+            'likes_count',
+            'dislikes_count',
+            'user_reaction_type'
         ]
 
 
@@ -129,3 +148,9 @@ class PostDetailSerializer(PostListSerializer):
         fields = PostListSerializer.Meta.fields + [
             'comments',
         ]
+
+
+class PostCommentReactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostCommentReaction
+        fields = '__all__'
