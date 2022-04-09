@@ -19,7 +19,7 @@ from django.conf import settings
 
 from django.conf.urls.static import static
 from forum.views import UserCreateView, UserDetailView, PostListCreateView, PostDetailsView, \
-    PostReactionsListCreateView, PostReactionsRetrieveUpdateDestroyView, PostCommentsListCreateView, \
+    PostReactionsRetrieveUpdateDestroyView, PostCommentsListCreateView, \
     PostCommentDetailsView
 
 urlpatterns = [
@@ -28,7 +28,6 @@ urlpatterns = [
     path('api/user/<user_id>', UserDetailView.as_view()),
     path('api/post', PostListCreateView.as_view()),
     path('api/post/<post_id>', PostDetailsView.as_view()),
-    path('api/post/<post_id>/reactions', PostReactionsListCreateView.as_view()),
     path('api/post/<post_id>/reactions/<reaction_type>',
          PostReactionsRetrieveUpdateDestroyView.as_view()),
     path('api/post/<post_id>/comments', PostCommentsListCreateView.as_view()),

@@ -1,3 +1,34 @@
+TODO: AUTHORIZATION
+
+
+# POST
+- URL: /api/register/<post_id>/reactions
+
+
+TODO: POST LIST
+
+# GET
+- URL: /api/posts
+- Response:
+    id <int>
+    category <str>
+    title <str>
+
+    created_at: <str>,
+    updated_at": "2022-04-09T15:09:55.729043Z",
+    "cover_url": "/Users/mykhailozinhan/Univercity/GitHub/webtech-back/media/posts/001_527_900.jpeg",
+    "owner": "mike",
+    "reactions": {
+        "likes": 0,
+        "dislikes": 0,
+        "user_reaction": null
+    },
+    "comments": 1
+}
+
+
+
+
 POST REACTIONS
 
 # GET
