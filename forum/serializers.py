@@ -41,9 +41,7 @@ class PostListSerializer(serializers.ModelSerializer):
         return post.reactions.filter(type=Reactions.DISLIKE_SHORT.value).count()
 
     def get_user_reaction_type(self, post):
-        # TODO: change to request user
-        user = User.objects.first()
-        user_reaction = post.reactions.filter(user=user).first()
+        user_reaction = post.reactions.filter(user=self.context['request'].user).first()
         return user_reaction and user_reaction.type
 
     class Meta:

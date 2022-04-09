@@ -24,8 +24,7 @@ class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
 
     def create(self, request, *args, **kwargs):
-        # TODO: change to request.user
-        request.data['owner_id'] = User.objects.first().id
+        request.data['owner_id'] = request.user.id
         return super().create(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -56,7 +55,7 @@ class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
 
     def put(self, request, *args, **kwargs):
         # TODO: change to request user
-        user = User.objects.first()
+        user = request.user.id
         post_id, reaction_type = kwargs["post_id"], kwargs['reaction_type']
         user_reaction = self.get_the_object(user)
         if not user_reaction:
@@ -84,8 +83,7 @@ class PostCommentsListCreateView(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         request.data['post_id'] = int(self.kwargs["post_id"])
-        # TODO: change to request.user
-        request.data['owner_id'] = User.objects.first().id
+        request.data['owner_id'] = request.user.id
         return super().create(request, *args, **kwargs)
 
 
