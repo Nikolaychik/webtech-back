@@ -23,6 +23,11 @@ class PostListCreateView(generics.ListCreateAPIView):
     serializer_class = PostListSerializer
     queryset = Post.objects.all()
 
+    def create(self, request, *args, **kwargs):
+        # TODO: change to request.user
+        request.data['owner_id'] = User.objects.first().id
+        return super().create(request, *args, **kwargs)
+
     def get_queryset(self):
         qs = Post.objects.all()
         order = self.request.query_params.get('order')
@@ -78,7 +83,9 @@ class PostCommentsListCreateView(generics.ListCreateAPIView):
         return self.list(request, post_id=self.kwargs["post_id"])
 
     def create(self, request, *args, **kwargs):
-        request.data['post'] = self.kwargs["post_id"]
+        request.data['post_id'] = int(self.kwargs["post_id"])
+        # TODO: change to request.user
+        request.data['owner_id'] = User.objects.first().id
         return super().create(request, *args, **kwargs)
 
 
