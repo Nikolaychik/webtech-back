@@ -15,16 +15,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PostListSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(required=False)
     category_id = serializers.IntegerField()
-    category_name = serializers.CharField(source='category.name')
+    category_name = serializers.CharField(source='category.name', required=False)
     title = serializers.CharField()
-    created_at = serializers.DateTimeField()
-    updated_at = serializers.DateTimeField()
-    cover_picture = serializers.ImageField(use_url=False)
-    owner_id = serializers.IntegerField()
-    owner_username = serializers.CharField(source='owner.username')
-    owner_avatar_picture = serializers.ImageField(source='owner.avatar_picture', use_url=False)
+    body = serializers.CharField()
+    created_at = serializers.DateTimeField(required=False)
+    updated_at = serializers.DateTimeField(required=False)
+    cover_picture = serializers.ImageField(use_url=False, required=False)
+    owner_id = serializers.IntegerField(required=False)
+    owner_username = serializers.CharField(source='owner.username', required=False)
+    owner_avatar_picture = serializers.ImageField(source='owner.avatar_picture', use_url=False, required=False)
     likes_count = serializers.SerializerMethodField()
     dislikes_count = serializers.SerializerMethodField()
     user_reaction_type = serializers.SerializerMethodField()
@@ -52,6 +53,7 @@ class PostListSerializer(serializers.ModelSerializer):
             'category_id',
             'category_name',
             'title',
+            'body',
             'created_at',
             'updated_at',
             'cover_picture',
@@ -72,24 +74,31 @@ class PostReactionSerializer(serializers.ModelSerializer):
 
 
 class PostCommentSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+    post_id = serializers.IntegerField()
+    body = serializers.CharField()
+    created_at = serializers.DateTimeField(required=False)
+    updated_at = serializers.DateTimeField(required=False)
+    owner_id = serializers.IntegerField(required=False)
+    owner_username = serializers.CharField(source='owner.username', required=False)
+    owner_avatar_picture = serializers.ImageField(source='owner.avatar_picture',
+                                                  use_url=False, required=False)
+    # TODO:
+    # likes_count = serializers.SerializerMethodField()
+    # dislikes_count = serializers.SerializerMethodField()
+    # user_reaction_type = serializers.SerializerMethodField()
     class Meta:
         model = PostComment
-        fields = '__all__'
-
-    # todo: refactor without to_representation
-    def to_representation(self, instance):
-        """
-        :type instance: PostComment
-        :rtype: dict
-        """
-        comment = instance
-        return {
-            "id": comment.id,
-            "body": comment.body,
-            "owner": comment.owner.username,
-            "updated_at": comment.updated_at,
-            "created_at": comment.created_at
-        }
+        fields = [
+            'id',
+            'body',
+            'post_id',
+            'created_at',
+            'updated_at',
+            'owner_id',
+            'owner_username',
+            'owner_avatar_picture',
+        ]
 
 
 class PostDetailSerializer(PostListSerializer):
