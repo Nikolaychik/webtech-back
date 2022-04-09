@@ -1,8 +1,6 @@
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
 
-from django.db.models import Count
 from rest_framework.response import Response
 from forum.models import Post, PostReaction, PostComment, User
 from forum.serializers import UserSerializer, PostDetailSerializer, PostListSerializer, \
@@ -16,7 +14,6 @@ class UserCreateView(generics.CreateAPIView):
 
 class UserDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return self.request.user
