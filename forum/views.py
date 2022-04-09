@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.generics import get_object_or_404
 
 from rest_framework.response import Response
@@ -10,6 +10,7 @@ from forum.tools import PostReactionsTool
 
 class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
 
 
 class UserDetailView(generics.RetrieveUpdateAPIView):

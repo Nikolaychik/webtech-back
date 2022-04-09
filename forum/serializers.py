@@ -1,17 +1,39 @@
 from rest_framework import serializers
 
-from forum.models import User, Post, PostComment, PostReaction, Reactions
+from forum.models import User, Post, PostComment, PostReaction, Reactions, Faculty
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        fields = '__all__'
+        fields = (
+            'id',
+            'username',
+            'password',
+            'first_name',
+            'last_name',
+            'faculty',
+            'speciality',
+            'course_number',
+        )
 
-    def validate(self, attrs):
-        user = self.context['request'].user
-        attrs['user_id'] = user.id
-        return attrs
+    def validate_username(self, username):
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError("This username is already taken")
+
+        return username
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            faculty=validated_data['faculty'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 
 class PostListSerializer(serializers.ModelSerializer):

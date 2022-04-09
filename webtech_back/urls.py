@@ -27,7 +27,7 @@ from forum.views import UserCreateView, UserDetailView, PostListCreateView, Post
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login', obtain_auth_token),
-    path('api/user', UserCreateView.as_view()),
+    path('api/register', UserCreateView.as_view()),
     path('api/user/<user_id>', UserDetailView.as_view()),
     path('api/post', PostListCreateView.as_view()),
     path('api/post/<post_id>', PostDetailsView.as_view()),

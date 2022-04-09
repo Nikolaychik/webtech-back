@@ -1,5 +1,6 @@
 from enum import Enum
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
@@ -24,6 +25,11 @@ class User(AbstractUser):
     password = models.CharField(max_length=250)
     avatar_picture = models.ImageField(null=True)
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE, null=True)
+    first_name = models.CharField(max_length=120, null=True)
+    last_name = models.CharField(max_length=120, null=True)
+    speciality = models.CharField(max_length=250, null=True)
+    course_number = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)], null=True)
+
     USERNAME_FIELD = 'username'
 
 
