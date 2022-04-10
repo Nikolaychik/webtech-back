@@ -6,6 +6,7 @@ from forum.models import User, Post, PostComment, PostReaction, Reactions, PostC
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+    avatar_picture = serializers.ImageField(use_url=False, required=False)
 
     class Meta:
         model = User
@@ -18,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             'faculty',
             'speciality',
             'course_number',
+            'avatar_picture',
         )
 
     def validate_username(self, username):
@@ -36,6 +38,25 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class UserMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        read_only_fields = (
+            'id',
+            'username',
+        )
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'faculty',
+            'speciality',
+            'course_number',
+            'avatar_picture',
+        )
+
+
 class PostCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = PostCategory
@@ -50,10 +71,10 @@ class PostListSerializer(serializers.ModelSerializer):
     body = serializers.CharField()
     created_at = serializers.DateTimeField(required=False)
     updated_at = serializers.DateTimeField(required=False)
-    cover_picture = serializers.ImageField(use_url=False, required=False)
+    cover_picture = serializers.ImageField(use_url=True, required=False)
     owner_id = serializers.IntegerField(required=False)
     owner_username = serializers.CharField(source='owner.username', required=False)
-    owner_avatar_picture = serializers.ImageField(source='owner.avatar_picture', use_url=False, required=False)
+    owner_avatar_picture = serializers.ImageField(source='owner.avatar_picture', use_url=True, required=False)
     likes_count = serializers.SerializerMethodField()
     dislikes_count = serializers.SerializerMethodField()
     user_reaction_type = serializers.SerializerMethodField()

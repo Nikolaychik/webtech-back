@@ -2,9 +2,9 @@ from rest_framework import generics, permissions
 from rest_framework.generics import get_object_or_404
 
 from rest_framework.response import Response
-from forum.models import Post, PostReaction, PostComment, PostCategory, PostCommentReaction
+from forum.models import Post, PostReaction, PostComment, PostCategory, PostCommentReaction, User
 from forum.serializers import UserSerializer, PostDetailSerializer, PostListSerializer, \
-    PostReactionSerializer, PostCommentSerializer, PostCategorySerializer, PostCommentReactionSerializer
+    PostReactionSerializer, PostCommentSerializer, PostCategorySerializer, PostCommentReactionSerializer, UserMeSerializer
 from forum.tools import ReactionsTool, base64_file
 
 
@@ -13,11 +13,25 @@ class UserCreateView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
 
-class UserDetailView(generics.RetrieveUpdateAPIView):
+class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
-    def get_queryset(self):
+    def get_object(self):
+        return get_object_or_404(User, id=self.kwargs["user_id"])
+
+
+class UserMeDetailView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserMeSerializer
+
+    def get_object(self):
         return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        cover_picture_base64 = request.data.get('avatar_picture')
+        if cover_picture_base64:
+            request.data['avatar_picture'] = base64_file(cover_picture_base64)
+
+        return super().update(request, *args, **kwargs)
 
 
 class ListCategoriesView(generics.ListAPIView):
