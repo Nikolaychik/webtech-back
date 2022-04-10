@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from forum.models import User, Post, PostComment, PostReaction, Reactions, PostCategory, PostCommentReaction
+from forum.models import User, Post, PostComment, PostReaction, Reactions, PostCategory, PostCommentReaction, Faculty
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -60,6 +60,12 @@ class UserMeSerializer(serializers.ModelSerializer):
 class PostCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = PostCategory
+        fields = '__all__'
+
+
+class FacultySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Faculty
         fields = '__all__'
 
 

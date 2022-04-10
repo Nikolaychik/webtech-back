@@ -3,9 +3,10 @@ from rest_framework import generics, permissions
 from rest_framework.generics import get_object_or_404
 
 from rest_framework.response import Response
-from forum.models import Post, PostReaction, PostComment, PostCategory, PostCommentReaction, User
+from forum.models import Post, PostReaction, PostComment, PostCategory, PostCommentReaction, User, Faculty
 from forum.serializers import UserSerializer, PostDetailSerializer, PostListSerializer, \
-    PostReactionSerializer, PostCommentSerializer, PostCategorySerializer, PostCommentReactionSerializer, UserMeSerializer
+    PostReactionSerializer, PostCommentSerializer, PostCategorySerializer, PostCommentReactionSerializer, \
+    UserMeSerializer, FacultySerializer
 from forum.tools import ReactionsTool, base64_file
 
 
@@ -41,6 +42,11 @@ class UserMeDetailView(generics.RetrieveUpdateAPIView):
             request.data['avatar_picture'] = base64_file(cover_picture_base64)
 
         return super().update(request, *args, **kwargs)
+
+
+class ListFacultiesView(generics.ListAPIView):
+    serializer_class = FacultySerializer
+    queryset = Faculty.objects.all()
 
 
 class ListCategoriesView(generics.ListAPIView):

@@ -22,12 +22,14 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from forum.views import UserCreateView, UserDetailView, PostListCreateView, PostDetailsView, \
     PostReactionsRetrieveUpdateDestroyView, PostCommentsListCreateView, \
-    PostCommentDetailsView, ListCategoriesView, PostCommentReactionsRetrieveUpdateDestroyView, UserMeDetailView
+    PostCommentDetailsView, ListCategoriesView, PostCommentReactionsRetrieveUpdateDestroyView, UserMeDetailView, \
+    ListFacultiesView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login', obtain_auth_token),
     path('api/register', UserCreateView.as_view()),
+    path('api/faculties', ListFacultiesView.as_view()),
     path('api/user/me', UserMeDetailView.as_view()),
     path('api/user/<user_id>', UserDetailView.as_view()),
     path('api/post', PostListCreateView.as_view()),
