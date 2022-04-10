@@ -162,7 +162,10 @@ class PostCommentSerializer(serializers.ModelSerializer):
 
 
 class PostDetailSerializer(PostListSerializer):
-    comments = PostCommentSerializer(many=True)
+    category_id = serializers.IntegerField(required=False)
+    title = serializers.CharField(required=False)
+    comments = PostCommentSerializer(many=True, required=False, read_only=True)
+
 
     class Meta:
         model = Post

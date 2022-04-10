@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import generics, permissions
 from rest_framework.generics import get_object_or_404
 
@@ -6,6 +7,14 @@ from forum.models import Post, PostReaction, PostComment, PostCategory, PostComm
 from forum.serializers import UserSerializer, PostDetailSerializer, PostListSerializer, \
     PostReactionSerializer, PostCommentSerializer, PostCategorySerializer, PostCommentReactionSerializer, UserMeSerializer
 from forum.tools import ReactionsTool, base64_file
+
+
+def check_owner_permission(foo):
+    def wrapper(self, request, *args, **kwargs):
+        if self.request.user != self.get_object().owner:
+            raise Http404
+        return foo(self, request, *args, **kwargs)
+    return wrapper
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -75,6 +84,10 @@ class PostDetailsView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return get_object_or_404(Post, id=self.kwargs["post_id"])
+
+    @check_owner_permission
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
 
 class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -157,3 +170,7 @@ class PostCommentDetailsView(generics.RetrieveUpdateDestroyAPIView):
             id=self.kwargs["comment_id"],
             post_id=self.kwargs["post_id"]
         )
+
+    @check_owner_permission
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
