@@ -2,10 +2,10 @@ from rest_framework import generics, permissions
 from rest_framework.generics import get_object_or_404
 
 from rest_framework.response import Response
-from forum.models import Post, PostReaction, PostComment, User, PostCategory, PostCommentReaction
+from forum.models import Post, PostReaction, PostComment, PostCategory, PostCommentReaction
 from forum.serializers import UserSerializer, PostDetailSerializer, PostListSerializer, \
     PostReactionSerializer, PostCommentSerializer, PostCategorySerializer, PostCommentReactionSerializer
-from forum.tools import ReactionsTool
+from forum.tools import ReactionsTool, base64_file
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -31,6 +31,10 @@ class PostListCreateView(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         request.data['owner_id'] = request.user.id
+        cover_picture_base64 = request.data.get('cover_picture')
+        if cover_picture_base64:
+            request.data['cover_picture'] = base64_file(cover_picture_base64)
+
         return super().create(request, *args, **kwargs)
 
     def get_queryset(self):

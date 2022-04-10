@@ -1,5 +1,16 @@
 from __future__ import unicode_literals, absolute_import, division, print_function
+import base64
+from django.core.files.base import ContentFile
+from uuid import uuid4
 from forum.models import PostReaction, Reactions, PostCommentReaction
+
+
+def base64_file(data, name=None):
+    _format, _img_str = data.split(';base64,')
+    _, ext = _format.split('/')
+    if not name:
+        name = uuid4().hex
+    return ContentFile(base64.b64decode(_img_str), name='{}.{}'.format(name, ext))
 
 
 class ReactionsTool():

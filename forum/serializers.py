@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from forum.models import User, Post, PostComment, PostReaction, Reactions, Faculty, PostCategory, PostCommentReaction
+from forum.models import User, Post, PostComment, PostReaction, Reactions, PostCategory, PostCommentReaction
 
 
 class UserSerializer(serializers.ModelSerializer):
