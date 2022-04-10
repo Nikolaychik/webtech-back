@@ -39,11 +39,20 @@ class PostListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = Post.objects.all()
+
+        owner_filter = self.request.query_params.get('owner_id')
+        if owner_filter:
+            qs = qs.filter(owner=owner_filter)
+        category_filter = self.request.query_params.get('category_id')
+        if category_filter:
+            qs = qs.filter(category=category_filter)
+
         order = self.request.query_params.get('order')
         if order == 'new':
             qs = qs.order_by("-created_at")
         elif order == 'popular':
             qs = qs.order_by('-reactions')
+
         return qs
 
 
