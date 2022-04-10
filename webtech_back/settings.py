@@ -136,3 +136,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+ALLOWED_HOSTS = ['134.209.95.86']
