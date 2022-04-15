@@ -21,8 +21,8 @@ from django.conf.urls.static import static
 from rest_framework.authtoken.views import obtain_auth_token
 
 from forum.views import UserCreateView, UserDetailView, PostListCreateView, PostDetailsView, \
-    PostReactionsRetrieveUpdateDestroyView, PostCommentsListCreateView, \
-    PostCommentDetailsView, ListCategoriesView, PostCommentReactionsRetrieveUpdateDestroyView, UserMeDetailView, \
+    PostReactionsUpdateView, PostCommentsListCreateView, PostCommentReactionsUpdateView, \
+    PostCommentDetailsView, ListCategoriesView, UserMeDetailView, \
     ListFacultiesView
 
 urlpatterns = [
@@ -34,11 +34,9 @@ urlpatterns = [
     path('api/user/<user_id>', UserDetailView.as_view()),
     path('api/post', PostListCreateView.as_view()),
     path('api/post/categories', ListCategoriesView.as_view()),
+    path('api/post/reactions', PostReactionsUpdateView.as_view()),
     path('api/post/<post_id>', PostDetailsView.as_view()),
-    path('api/post/<post_id>/reactions/<reaction_type>',
-         PostReactionsRetrieveUpdateDestroyView.as_view()),
     path('api/post/<post_id>/comments', PostCommentsListCreateView.as_view()),
     path('api/post/<post_id>/comments/<comment_id>', PostCommentDetailsView.as_view()),
-    path('api/post/<post_id>/comments/<comment_id>/reactions/<reaction_type>',
-         PostCommentReactionsRetrieveUpdateDestroyView.as_view()),
+    path('api/post/comments/reactions', PostCommentReactionsUpdateView.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

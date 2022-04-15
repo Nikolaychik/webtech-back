@@ -96,18 +96,18 @@ class PostDetailsView(generics.RetrieveUpdateDestroyAPIView):
         return self.update(request, *args, **kwargs)
 
 
-class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class PostReactionsUpdateView(generics.UpdateAPIView):
     serializer_class = PostReactionSerializer
 
     def get_object(self):
         """ rtype: PostReaction | None """
         return PostReaction.objects.filter(
-            post=self.kwargs["post_id"],
+            post=self.request.data["post_id"],
             user=self.request.user).first()
 
     def put(self, request, *args, **kwargs):
         user = request.user
-        post_id, reaction_type = kwargs["post_id"], kwargs['reaction_type']
+        post_id, reaction_type = request.data["post_id"], request.data['reaction_type']
         user_reaction = self.get_object()
         if not user_reaction:
             serializer = self.get_serializer(
@@ -125,18 +125,18 @@ class PostReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
         return Response(ReactionsTool.get_post_reactions(user, post_id))
 
 
-class PostCommentReactionsRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class PostCommentReactionsUpdateView(generics.UpdateAPIView):
     serializer_class = PostCommentReactionSerializer
 
     def get_object(self):
         """ rtype: PostCommentReaction | None """
         return PostCommentReaction.objects.filter(
-            comment=self.kwargs["comment_id"],
+            comment=self.request.data["comment_id"],
             user=self.request.user).first()
 
     def put(self, request, *args, **kwargs):
         user = request.user
-        comment_id, reaction_type = kwargs["comment_id"], kwargs['reaction_type']
+        comment_id, reaction_type = request.data["comment_id"], request.data['reaction_type']
         user_reaction = self.get_object()
         if not user_reaction:
             serializer = self.get_serializer(

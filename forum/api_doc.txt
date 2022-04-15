@@ -262,8 +262,8 @@ ____________________________________________________________POSTS COMMENTS
 
 ____________________________________________________________POSTS REACTIONS
 # PUT
-- URL: /api/post/<post_id>/reactions/<reaction_type>
-- Arguments:
+- URL: /api/post/reactions
+- Request body:
     post_id <int>
     reaction_type OneOf('l', 'd') <str>
 - Response:
@@ -273,8 +273,8 @@ ____________________________________________________________POSTS REACTIONS
 
 ____________________________________________________________POSTS COMMENTS REACTIONS
 # PUT
-- URL: /api/post/<post_id>/comments/<comment_id>/reactions/<reaction_type>
-- Arguments:
+- URL: /api/post/comments/reactions
+- Request body:
     comment_id <int>
     post_id <int>
     reaction_type OneOf('l', 'd') <str>
