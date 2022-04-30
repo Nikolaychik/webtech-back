@@ -1,51 +1,284 @@
-TODO: AUTHORIZATION
+#############
+#  API DOC  #
+#############
 
 
+
+____________________________________________________________REGISTRATION
 # POST
-- URL: /api/register/<post_id>/reactions
+- URL: /api/register
+- Request body:
+    username <str>
+    password <str>
+    faculty <int>
 
 
-TODO: POST LIST
+____________________________________________________________AUTHORIZATION
+# POST
+- URL: /api/login
+- Request body:
+    username <str>
+    password <str>
+- Response:
+    token <str>
 
+
+
+
+
+
+
+____________________________________________________________FACULTY
 # GET
-- URL: /api/posts
+- URL: /api/faculties
 - Response:
     id <int>
-    category <str>
-    title <str>
-
-    created_at: <str>,
-    updated_at": "2022-04-09T15:09:55.729043Z",
-    "cover_url": "/Users/mykhailozinhan/Univercity/GitHub/webtech-back/media/posts/001_527_900.jpeg",
-    "owner": "mike",
-    "reactions": {
-        "likes": 0,
-        "dislikes": 0,
-        "user_reaction": null
-    },
-    "comments": 1
-}
+    full_name <str>
+    short_name <str>
 
 
 
-
-POST REACTIONS
-
+____________________________________________________________USER PROFILE
 # GET
-- URL: /api/post/<post_id>/reactions
-- Arguments:
-    post_id <int>
+- URL: /api/user/me
 - Response:
-    likes <int>
-    dislikes <int>
-    user_reaction OneOf('l', 'd', None) <str> | None
-
+    id <int>
+    username <str>
+    first_name <str> | null
+    last_name <str> | null
+    faculty <int>
+    speciality <str> | null
+    course_number <int> | null
+    avatar_picture <url str> | null
 # PUT
-- URL: /api/post/<post_id>/reactions/<reaction_type>
-- Arguments:
+- URL: /api/user/me
+- Request body:
+    first_name <str> | null (Not required)
+    last_name <str> | null (Not required)
+    faculty <int> (Not required)
+    speciality <str> | null (Not required)
+    course_number <int> | null (Not required)
+    avatar_picture <base64 str> | null (Not required)
+- Response:
+    id <int>
+    username <str>
+    first_name <str> | null
+    last_name <str> | null
+    faculty <int>
+    speciality <str> | null
+    course_number <int> | null
+    avatar_picture <url str> | null
+# GET
+- URL: /api/user/<user_id>
+- Response:
+    id <int>
+    username <str>
+    first_name <str> | null
+    last_name <str> | null
+    faculty <int>
+    speciality <str> | null
+    course_number <int> | null
+    avatar_picture <url str> | null
+
+
+
+
+____________________________________________________________POST CATEGORIES
+# GET
+- URL: /api/post/categories
+- Response:
+    id <int>
+    name <str>
+    description <str>
+
+
+
+____________________________________________________________POSTS
+# GET
+- URL: /api/post
+- Query Params:
+    order OneOf(new, popular) (Not required)
+    owner_id <int> (Not required)
+    category_id <int> (Not required)
+- Response:
+    list of:
+        id <int>
+        category_id <int>
+        category_name <str>
+        title <str>
+        body <str>
+        created_at <datetime str>
+        updated_at <datetime str>
+        cover_picture <url str> | null
+        owner_id <int>
+        owner_username <str>
+        owner_avatar_picture <url str> | null
+        likes_count <int>
+        dislikes_count <int>
+        user_reaction OneOf('l', 'd', null) <str> | null
+        comments: <int>
+# POST
+- URL: /api/post
+- Request body:
+    title <str>
+    body <str>
+    category_id <int>
+    cover_picture <base64 pic> (Not required)
+- Response:
+    id <int>
+    category_id <int>
+    category_name <str>
+    title <str>
+    body <str>
+    created_at <datetime str>
+    updated_at <datetime str>
+    cover_picture <url str> | null
+    owner_id <int>
+    owner_username <str>
+    owner_avatar_picture <url str> | null
+    likes_count <int>
+    dislikes_count <int>
+    user_reaction OneOf('l', 'd', null) <str> | null
+    comments: <int>
+# GET
+- URL: /api/post/<post_id>
+- Response:
+    id <int>
+    category_id <int>
+    category_name <str>
+    title <str>
+    body <str>
+    created_at <datetime str>
+    updated_at <datetime str>
+    cover_picture <url str>
+    owner_id <int>
+    owner_username <str>
+    owner_avatar_picture <url str>
+    likes_count <int>
+    dislikes_count <int>
+    user_reaction OneOf('l', 'd', null) <str> | null
+    comments:
+        list of:
+            <comment response>
+# PUT
+- URL: /api/post/<post_id>
+- Request body:
+    title <str> (Not required)
+    body <str> (Not required)
+    category_id <int> (Not required)
+    cover_picture <base64 pic> (Not required)
+- Response:
+    id <int>
+    category_id <int>
+    category_name <str>
+    title <str>
+    body <str>
+    created_at <datetime str>
+    updated_at <datetime str>
+    cover_picture <url str>
+    owner_id <int>
+    owner_username <str>
+    owner_avatar_picture <url str>
+    likes_count <int>
+    dislikes_count <int>
+    user_reaction OneOf('l', 'd', null) <str> | null
+    comments:
+        list of:
+            <comment response>
+
+
+
+
+
+
+____________________________________________________________POSTS COMMENTS
+# GET
+- URL: /api/post/<post_id>/comments
+- Response:
+    list of:
+        id <int>
+        body <str>
+        post_id <int>
+        created_at <datetime str>
+        updated_at <datetime str>
+        owner_id <int>
+        owner_username <str>
+        owner_avatar_picture <url str> | null
+        likes_count <int>
+        dislikes_count <int>
+        user_reaction OneOf('l', 'd', null) <str> | null
+# POST
+- URL: /api/post/<post_id>/comments
+- Request body:
+    body <str>
+- Response:
+    id <int>
+    body <str>
+    post_id <int>
+    created_at <datetime str>
+    updated_at <datetime str>
+    owner_id <int>
+    owner_username <str>
+    owner_avatar_picture <url str> | null
+    likes_count <int>
+    dislikes_count <int>
+    user_reaction OneOf('l', 'd', null) <str> | null
+# GET
+- URL: /api/post/<post_id>/comments/<comment_id>
+- Response:
+    id <int>
+    body <str>
+    post_id <int>
+    created_at <datetime str>
+    updated_at <datetime str>
+    owner_id <int>
+    owner_username <str>
+    owner_avatar_picture <url str> | null
+    likes_count <int>
+    dislikes_count <int>
+    user_reaction OneOf('l', 'd', null) <str> | null
+# PUT
+- URL: /api/post/<post_id>/comments/<comment_id>
+- Request body:
+    body <str>
+- Response:
+    id <int>
+    body <str>
+    post_id <int>
+    created_at <datetime str>
+    updated_at <datetime str>
+    owner_id <int>
+    owner_username <str>
+    owner_avatar_picture <url str> | null
+    likes_count <int>
+    dislikes_count <int>
+    user_reaction OneOf('l', 'd', null) <str> | null
+
+
+
+
+
+
+
+____________________________________________________________POSTS REACTIONS
+# PUT
+- URL: /api/post/reactions
+- Request body:
     post_id <int>
     reaction_type OneOf('l', 'd') <str>
 - Response:
     likes <int>
     dislikes <int>
-    user_reaction OneOf('l', 'd', None) <str> | None
+    user_reaction OneOf('l', 'd', null) <str> | null
+
+____________________________________________________________POSTS COMMENTS REACTIONS
+# PUT
+- URL: /api/post/comments/reactions
+- Request body:
+    comment_id <int>
+    post_id <int>
+    reaction_type OneOf('l', 'd') <str>
+- Response:
+    likes <int>
+    dislikes <int>
+    user_reaction OneOf('l', 'd', null) <str> | null
