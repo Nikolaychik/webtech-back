@@ -47,6 +47,7 @@ class UserMeDetailView(generics.RetrieveUpdateAPIView):
 class ListFacultiesView(generics.ListAPIView):
     serializer_class = FacultySerializer
     queryset = Faculty.objects.all()
+    permission_classes = [permissions.AllowAny]
 
 
 class ListCategoriesView(generics.ListAPIView):
