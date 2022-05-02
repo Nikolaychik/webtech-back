@@ -46,13 +46,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserMeSerializer(serializers.ModelSerializer):
-    faculty = FacultySerializer()
+    faculty = FacultySerializer(read_only=True)
 
     class Meta:
         model = User
         read_only_fields = (
             'id',
             'username',
+            'faculty',
         )
         fields = (
             'id',

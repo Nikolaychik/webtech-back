@@ -37,6 +37,11 @@ class UserMeDetailView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
     def update(self, request, *args, **kwargs):
+        faculty_id = request.data.pop('faculty')
+        if faculty_id:
+            self.request.user.faculty = Faculty.objects.get(id=faculty_id)
+            self.request.user.save()
+
         cover_picture_base64 = request.data.get('avatar_picture')
         if cover_picture_base64:
             request.data['avatar_picture'] = base64_file(cover_picture_base64)
