@@ -3,10 +3,17 @@ from rest_framework import serializers
 from forum.models import User, Post, PostComment, PostReaction, Reactions, PostCategory, PostCommentReaction, Faculty
 
 
+class FacultySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Faculty
+        fields = '__all__'
+
+
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
     avatar_picture = serializers.ImageField(use_url=False, required=False)
+    faculty = FacultySerializer()
 
     class Meta:
         model = User
@@ -39,6 +46,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserMeSerializer(serializers.ModelSerializer):
+    faculty = FacultySerializer()
+
     class Meta:
         model = User
         read_only_fields = (
@@ -60,12 +69,6 @@ class UserMeSerializer(serializers.ModelSerializer):
 class PostCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = PostCategory
-        fields = '__all__'
-
-
-class FacultySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Faculty
         fields = '__all__'
 
 
