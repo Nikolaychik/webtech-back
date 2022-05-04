@@ -22,6 +22,18 @@ class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
+    def create(self, request, *args, **kwargs):
+        faculty_id = request.data.pop('faculty')
+        cover_picture_base64 = request.data.get('avatar_picture')
+        if cover_picture_base64:
+            request.data['avatar_picture'] = base64_file(cover_picture_base64)
+
+        response = super().create(request, *args, **kwargs)
+        user = User.objects.get(id=response.data['id'])
+        user.faculty = Faculty.objects.get(id=faculty_id)
+        user.save()
+        return response
+
 
 class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer

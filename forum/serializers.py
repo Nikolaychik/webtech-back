@@ -12,8 +12,7 @@ class FacultySerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
-    avatar_picture = serializers.ImageField(use_url=False, required=False)
-    faculty = FacultySerializer()
+    faculty = FacultySerializer(required=False)
 
     class Meta:
         model = User
@@ -36,11 +35,9 @@ class UserSerializer(serializers.ModelSerializer):
         return username
 
     def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            faculty=validated_data['faculty'],
-        )
-        user.set_password(validated_data['password'])
+        password = validated_data.pop('password')
+        user = User.objects.create(**validated_data)
+        user.set_password(password)
         user.save()
         return user
 
