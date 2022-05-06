@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.http import Http404
 from rest_framework import generics, permissions
 from rest_framework.generics import get_object_or_404
@@ -98,7 +99,7 @@ class PostListCreateView(generics.ListCreateAPIView):
         if order == 'new':
             qs = qs.order_by("-created_at")
         elif order == 'popular':
-            qs = qs.order_by('-reactions')
+            qs = qs.annotate(num_reactions=Count('reactions')).order_by('-num_reactions')
 
         qs = qs.distinct()
         return qs
