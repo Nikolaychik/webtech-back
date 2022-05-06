@@ -100,6 +100,7 @@ class PostListCreateView(generics.ListCreateAPIView):
         elif order == 'popular':
             qs = qs.order_by('-reactions')
 
+        qs = qs.distinct()
         return qs
 
 
